@@ -1,61 +1,77 @@
 use dirs;
 use std::io;
 use std::path::PathBuf;
-use std::{fs::File, io::prelude::*};
+use std::{fs, fs::File, io::prelude::*};
 
-use serde::Deserialize;
+use anyhow::{anyhow, Result};
+use serde::{Serialize, Deserialize};
 use toml;
-use anyhow::{Result, anyhow};
 
-#[derive(Debug, Clone)]
-enum ConfError {
-    
-}
-
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     api: API,
-    default: Default
+    default: Option<Default>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Default {
     city: String,
-    country: String
+    country: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct API {
-    app_id: String
+    app_id: String,
 }
 
-fn check_config_path() {}
+/// Initializes a new basic config file with an OpenWeatherMap API key. 
+fn init_new_config(config_path: PathBuf) -> Result<Config> {
+    let mut input = String::new();
+    println!("This program requires an OpenWeatherMap API key to query the weather data. Please insert your API key: ");
+    io::stdin().read_line(&mut input)?;
+    input.pop();
 
-/// Reads 
+    let new_config: Config = Config {
+        api: { API { app_id: input } },
+        default: None,
+    };
+
+    let mut file = File::create(config_path)?;
+    let toml = toml::to_string(&new_config)?;
+    file.write_all(toml.as_bytes())?;
+
+    Ok(new_config)
+}
+
+/// Reads the config file. If it doesn't exist it will create a new.
 pub fn read_config() -> Result<Config> {
     let conf_path: PathBuf;
 
-     match dirs::config_dir() {
+    match dirs::config_dir() {
         Some(dir) => {
-            conf_path = dir
-                        .join("weathercli")
-                        .join("wcliconf.toml")
-        },
-        None => return Err(anyhow!("Could not find the config directory in your system!"))
+            conf_path = dir.join("weathercli").join("wcliconf.toml");
+        }
+        None => {
+            return Err(anyhow!(
+                "Could not find the config directory in your system!"
+            ))
+        }
     }
 
-    println!("{:#?}", conf_path);
+    if !conf_path.exists() {
+        init_new_config(conf_path)
+    } else {
+        let mut file = File::open(conf_path)?;
+        let mut result = String::new();
+        file.read_to_string(&mut result)?;
 
-    let mut file = File::open(conf_path)?;
-    let mut result = String::new();
-    file.read_to_string(&mut result)?;
+        let conf: Config = toml::from_str(result.as_str())?;
 
-    let conf: Config = toml::from_str(result.as_str())?;
-
-    Ok(conf)
+        Ok(conf)
+    }
 }
 
 pub fn init() {
-    let config = read_config().unwrap();    
+    let config = read_config().unwrap();
     println!("{:#?}", config);
 }

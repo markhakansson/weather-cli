@@ -14,7 +14,7 @@ struct Cli {
     location: Option<String>,
     #[structopt(short = "h", long = "hometown")]
     /// Set default hometown. Will be used if no location is specified.
-    hometown: Option<String>
+    hometown: Option<String>,
 }
 
 fn main() {
