@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::{fs::File, io::prelude::*};
 
 use anyhow::{anyhow, Result};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use toml;
 
 const CONFIG_DIR: &str = "weathercli";
@@ -27,7 +27,7 @@ pub struct API {
     pub app_id: String,
 }
 
-/// Initializes a new basic config file with an OpenWeatherMap API key. 
+/// Initializes a new basic config file with an OpenWeatherMap API key.
 fn init_new_config(config_path: PathBuf) -> Result<Config> {
     let mut input = String::new();
     println!("This program requires an OpenWeatherMap API key to query the weather data. Please insert your API key: ");
