@@ -1,27 +1,30 @@
 use dirs;
 use std::io;
 use std::path::PathBuf;
-use std::{fs, fs::File, io::prelude::*};
+use std::{fs::File, io::prelude::*};
 
 use anyhow::{anyhow, Result};
 use serde::{Serialize, Deserialize};
 use toml;
 
+const CONFIG_DIR: &str = "weathercli";
+const CONFIG_NAME: &str = "wcliconf.toml";
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    api: API,
-    default: Option<Default>,
+    pub api: API,
+    pub default: Option<Default>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Default {
-    city: String,
-    country: String,
+    pub city: String,
+    pub country: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct API {
-    app_id: String,
+    pub app_id: String,
 }
 
 /// Initializes a new basic config file with an OpenWeatherMap API key. 
@@ -49,7 +52,7 @@ pub fn read_config() -> Result<Config> {
 
     match dirs::config_dir() {
         Some(dir) => {
-            conf_path = dir.join("weathercli").join("wcliconf.toml");
+            conf_path = dir.join(CONFIG_DIR).join(CONFIG_NAME);
         }
         None => {
             return Err(anyhow!(
@@ -69,9 +72,4 @@ pub fn read_config() -> Result<Config> {
 
         Ok(conf)
     }
-}
-
-pub fn init() {
-    let config = read_config().unwrap();
-    println!("{:#?}", config);
 }
