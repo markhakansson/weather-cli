@@ -28,6 +28,7 @@ pub struct API {
 }
 
 /// Initializes a new basic config file with an OpenWeatherMap API key.
+/// * `config_path` - Configuration path of this system.
 fn init_new_config(config_path: PathBuf) -> Result<Config> {
     let mut input = String::new();
     println!("This program requires an OpenWeatherMap API key to query the weather data. Please insert your API key: ");

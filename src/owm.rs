@@ -86,8 +86,9 @@ pub struct Sys {
 }
 
 /// Queries OpenWeatherMap and returns a JSON with the weather data for that query.
-pub fn get_current_weather(url: String, query: String) -> Result<CurrentWeather> {
-    let mut url = Url::parse(&url)?;
+/// * `query` - The OpenWeatherMap query. Need to include the 'appid' i.e. API key.
+pub fn get_current_weather(query: String) -> Result<CurrentWeather> {
+    let mut url = Url::parse("https://api.openweathermap.org/data/2.5/weather")?;
     url.set_query(Some(&query));
     let json: CurrentWeather = reqwest::blocking::get(url)?.json()?;
     Ok(json)
