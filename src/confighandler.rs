@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use toml;
 
 const CONFIG_DIR: &str = "weathercli";
-const CONFIG_NAME: &str = "wcliconf.toml";
+const CONFIG_NAME: &str = "config.toml";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
